@@ -20,7 +20,7 @@ exports.createUser = async (req, res) => {
 
     const user = await User.create(req.body);
     const token = jwt.sign(
-      { email: user.email, role: user.role },
+      { email: user.email, role: user.role, user_id: user._id },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
@@ -54,13 +54,16 @@ exports.getUser = async (req, res) => {
 exports.getUserId = async (req, res) => {
   try {
     const getUser = await User.findById(req.params.id);
+    console.log("user::: ", getUser);
     res?.status(200)?.json({
       statusCode: 200,
       data: getUser,
       success: true,
+      message: "User data fetched",
     });
   } catch (error) {
-    res.status(400).json({ success: false, err: err });
+    console.log("error::: ", error);
+    res.status(400).json({ success: false, err: error });
   }
 };
 
@@ -89,6 +92,7 @@ exports.userLogin = async (req, res) => {
     const getUser = await User.findOne({
       email: req.body.email,
     });
+    console.log("getUser::: ", getUser._id);
     if (!getUser)
       return res
         .status(400)
@@ -100,7 +104,7 @@ exports.userLogin = async (req, res) => {
         .json({ message: "Invalid Credentials", success: false });
 
     const token = jwt.sign(
-      { email: getUser.email, role: getUser.role },
+      { email: getUser.email, role: getUser.role, user_id: getUser._id },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN }
     );
