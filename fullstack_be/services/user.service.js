@@ -52,9 +52,11 @@ exports.getUser = async (req, res) => {
 
 //Get User by ID
 exports.getUserId = async (req, res) => {
+  const { userDetails } = req.headers;
   try {
-    const getUser = await User.findById(req.params.id);
-    console.log("user::: ", getUser);
+    const getUser = await User.findById(userDetails.user_id).select(
+      "first_name last_name mobile"
+    );
     res?.status(200)?.json({
       statusCode: 200,
       data: getUser,
@@ -69,12 +71,15 @@ exports.getUserId = async (req, res) => {
 
 //Update User by ID
 exports.updateUser = async (req, res) => {
-  console.log("req.body::: ", req.body);
-  console.log("req.params.id::: ", req.params.id);
+  const { userDetails } = req.headers;
   try {
-    const getUser = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const getUser = await User.findByIdAndUpdate(
+      userDetails.user_id,
+      req.body,
+      {
+        new: true,
+      }
+    );
 
     res?.status(200)?.json({
       statusCode: 200,
@@ -92,7 +97,6 @@ exports.userLogin = async (req, res) => {
     const getUser = await User.findOne({
       email: req.body.email,
     });
-    console.log("getUser::: ", getUser._id);
     if (!getUser)
       return res
         .status(400)

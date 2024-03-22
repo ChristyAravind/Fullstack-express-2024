@@ -1,15 +1,22 @@
-const express = require('express');
-
-//importing the service
-const {createUser,getUser,updateUser,getUserId,userLogin} = require('../services/user.service');
-
-//importing express router from express
+const express = require("express");
+const authenticateToken = require("../utils/common");
 const router = express.Router();
 
-router.route('/create').post(createUser);
-router.route('/update/:id').put(updateUser);
-router.route('/get').get(getUser);
-router.route('/get/:id').get(getUserId);
-router.route('/login').post(userLogin);
+//importing the service
+const {
+  createUser,
+  getUser,
+  updateUser,
+  getUserId,
+  userLogin,
+} = require("../services/user.service");
 
-module.exports =router
+//importing express router from express
+
+router.post("/create", createUser);
+router.post("/login", userLogin);
+router.put("/updateById", authenticateToken, updateUser);
+router.get("/get", authenticateToken, getUser);
+router.get("/getById", authenticateToken, getUserId);
+
+module.exports = router;
